@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta Interactiva</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .option-group {
+            margin: 15px 0;
+        }
+        .option-group label {
+            font-size: 1.1em;
+            margin-left: 10px;
+        }
+        #botonVotar {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #botonVotar:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        #contenedorResultados {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+        #listaDeResultados {
+            list-style: none;
+            padding: 0;
+        }
+        #listaDeResultados li {
+            background-color: #ecf0f1;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .porcentaje {
+            font-weight: bold;
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Encuesta Interactiva con Resultados en Tiempo Real</h1>
+        <h2>¿Cuál es tu lenguaje de programación favorito?</h2>
+        <form id="formularioEncuesta">
+            <div class="option-group">
+                <input type="radio" id="javascript" name="lenguaje" value="JavaScript">
+                <label for="javascript">JavaScript</label>
+            </div>
+            <div class="option-group">
+                <input type="radio" id="python" name="lenguaje" value="Python">
+                <label for="python">Python</label>
+            </div>
+            <div class="option-group">
+                <input type="radio" id="cplusplus" name="lenguaje" value="C++">
+                <label for="cplusplus">C++</label>
+            </div>
+            <div class="option-group">
+                <input type="radio" id="other" name="lenguaje" value="Otro">
+                <label for="other">Otro</label>
+            </div>
+            <button type="submit" id="botonVotar">Votar</button>
+        </form>
+        
+        <div id="contenedorResultados" style="display: none;">
+            <h3>Resultados:</h3>
+            <ul id="listaDeResultados"></ul>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Objeto para almacenar el conteo de votos de cada opción de la encuesta.
+            const conteoVotos = {
+                'JavaScript': 0,
+                'Python': 0,
+                'C++': 0,
+                'Otro': 0
+            };
+        
+            const formularioEncuesta = document.getElementById('formularioEncuesta');
+            const botonVotar = document.getElementById('botonVotar');
+            const contenedorResultados = document.getElementById('contenedorResultados');
+            const listaDeResultados = document.getElementById('listaDeResultados');
+        
+            formularioEncuesta.addEventListener('submit', (evento) => {
+                evento.preventDefault(); // Evita que la página se recargue al enviar el formulario.
+        
+                const opcionSeleccionada = document.querySelector('input[name="lenguaje"]:checked');
+        
+                if (opcionSeleccionada) {
+                    const valorVoto = opcionSeleccionada.value;
+                    // Incrementa el contador de votos para la opción seleccionada.
+                    conteoVotos[valorVoto]++;
+                    
+                    // Llama a la función para actualizar y mostrar los resultados.
+                    mostrarResultados();
+                    
+                    // Deshabilita el formulario para que el usuario no pueda votar de nuevo.
+                    deshabilitarFormulario();
+                } else {
+                    alert('Por favor, selecciona una opción antes de votar.');
+                }
+            });
+        
+            function mostrarResultados() {
+                // Calcula el número total de votos para obtener los porcentajes.
+                const totalVotos = Object.values(conteoVotos).reduce((acumulador, actual) => acumulador + actual, 0);
+        
+                // Limpia la lista de resultados para evitar que se dupliquen.
+                listaDeResultados.innerHTML = '';
+                
+                // Muestra el contenedor de resultados que estaba oculto.
+                contenedorResultados.style.display = 'block';
+        
+                for (const opcion in conteoVotos) {
+                    const numeroVotos = conteoVotos[opcion];
+                    // Calcula el porcentaje, asegurando que no haya división por cero.
+                    const porcentaje = totalVotos === 0 ? 0 : ((numeroVotos / totalVotos) * 100).toFixed(1);
+        
+                    const elementoLista = document.createElement('li');
+                    elementoLista.innerHTML = `
+                        <span>${opcion}: ${numeroVotos} votos</span>
+                        <span class="porcentaje">${porcentaje}%</span>
+                    `;
+                    listaDeResultados.appendChild(elementoLista);
+                }
+            }
+        
+            function deshabilitarFormulario() {
+                const botonesRadio = document.querySelectorAll('input[name="lenguaje"]');
+                botonesRadio.forEach(radio => radio.disabled = true);
+                botonVotar.disabled = true;
+                botonVotar.textContent = 'Votado';
+            }
+        });
+    </script>
+</body>
+</html>
